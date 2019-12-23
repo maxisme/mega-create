@@ -2,29 +2,17 @@
 ###################
 # argument parser #
 ###################
-while getopts "hd:n:u:p:e:" opt; do
+while getopts "hd:e:" opt; do
   case ${opt} in
     h )
       echo "Usage:"
       echo "    -h                Display this help message."
-      echo "    -d                Email domain for Mega account"
-      echo "    -n                Database name"
-      echo "    -u                Database username"
-      echo "    -p                Database password"
-      echo "    -e                Email username to generate Mega account"
+      echo "    -d                Domain for Mega account"
+      echo "    -e                Username to generate Mega account"
       exit 0
       ;;
     d )
       domain=$OPTARG
-      ;;
-    n )
-      db_name=$OPTARG
-      ;;
-    u )
-      db_user=$OPTARG
-      ;;
-    p )
-      db_pass=$OPTARG
       ;;
     e )
       username=$OPTARG
@@ -41,24 +29,6 @@ shift $((OPTIND -1))
 if [[ "$domain" == "" ]]
 then
     echo "You must specify the email domain [-d]"
-    exit 1
-fi
-
-if [[ "$db_name" == "" ]]
-then
-    echo "You must specify the database name [-n]"
-    exit 1
-fi
-
-if [[ "$db_user" == "" ]]
-then
-    echo "You must specify the database username [-u]"
-    exit 1
-fi
-
-if [[ "$db_pass" == "" ]]
-then
-    echo "You must specify the database password [-p]"
     exit 1
 fi
 
@@ -84,45 +54,43 @@ cntfile="/root/mega/cnt_$domain"
 if [[ "$username" == "" ]]
 then
     # use incremental counter if no username specified
-    cnt=$(<"$cntfile")
+    cnt=$(<"$user_cntfile")
     cnt=$(( cnt + 1 ))
-    username="$cnt"
+    username="$user_cnt"
 fi
 
-# email account details
-email="$username@$domain"
+# create email
+/usr/local/bin/addmailuser "$username@$domain"
 
-# create email account
-password=$(bash ../add-user.sh -u "$db_user" -p "$db_pass" -n "$db_name" -e "$email")
 
 # remove all inbox
-email_dir="/var/mail/vhosts/$domain/$username/new/"
+email_dir="/var/mail/$domain/$username/new/"
 rm -rf "$email_dir*"
 
 # account creation with same password generated for email
-reg=$(megareg --register --email "$email" --name "Foo" --password "$password")
+reg=$(megareg --register --email "$email" --name "John Doe" --password "$password")
 
 # get verify code part 1
 code1=$(echo "${reg}" | sed -n 3p)
 
 if [[ "$code1" == "" ]]
 then
-	echo "Already registered this email $email."
-    if [[ "$cnt" != "" ]]
+	echo "Already registered the email: $email."
+    if [[ "$user_cnt" != "" ]]
     then
         # increment the counter
-        echo "$cnt" > "$cntfile"
-        echo "Incremented account counter $cnt"
+        echo "$user_cnt" > "$user_cntfile"
+        echo "Incremented account counter $user_cnt"
     fi
 	exit
 fi
 
 #check if email containing code is there
-X=1
+check_cnt=1
 function checkforcode {
-	sleep 5 # wait for email to arrive in inbox.
+	sleep 2 # wait for email to arrive in inbox.
 
-    if (("$X" < "20"))
+    if (("$check_cnt" < "20"))
     then
         # look for verify email in inbox with verify code part 2
         for i in "$email_dir"*
@@ -135,8 +103,8 @@ function checkforcode {
             code2=${code2/mega.nz/mega.co.nz}
             if [[ $code2 != *"mega"* ]]
             then
-                echo "attempt" $X
-                X=$(( X + 1 ))
+                echo "attempt" $check_cnt
+                check_cnt=$(( check_cnt + 1 ))
                 checkforcode
             fi
         done
@@ -148,21 +116,20 @@ function checkforcode {
 checkforcode
 
 # run verifying code
-cmd "${code1/@LINK@/$code2}" > /tmp/createMegaVerification
-verifyCODE=$(</tmp/createMegaVerification)
-rm /tmp/createMegaVerification
+# cmd "${code1/@LINK@/$code2}" > /tmp/createMegaVerification
+# verifyCODE=$(</tmp/createMegaVerification)
+# rm /tmp/createMegaVerification
+verifyCODE=$(cmd "${code1/@LINK@/$code2}")
 
 if [[ $verifyCODE == *"Account registered successfully!"* ]]
 then
     # increment counter
-	if [[ "$cnt" != "" ]]
+	if [[ "$user_cnt" != "" ]]
     then
-        echo "$cnt" > "$cntfile"
+        echo "$user_cnt" > "$user_cntfile"
     fi
 
-    # insert account details into db
-	mysql --user="$db_user" --password="$db_pass" -e "USE $db_name; INSERT INTO mega_account (username, password) VALUES ('$email', '$password')"
-
+	echo "{'email': $email, 'password': $password}\n" >> /var/log/mega-accounts.log
 	echo "{'email': $email, 'password': $password}"
 else
 	echo "failed registration: $verifyCODE"
