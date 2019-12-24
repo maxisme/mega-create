@@ -45,23 +45,29 @@ else
 fi
 trap $(rm -f $LOCKFILE)
 
-
 ##########
 # SCRIPT #
 ##########
+password=`strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 50 | tr -d '\n'; echo`
 cntfile="/root/mega/cnt_$domain"
+
+mkdir -p /root/mega/
 
 if [[ "$username" == "" ]]
 then
     # use incremental counter if no username specified
-    cnt=$(<"$user_cntfile")
+    cnt=$(<"$cntfile")
+    if [[ "$cnt" == "" ]]
+    then
+	    cnt=0
+    fi
     cnt=$(( cnt + 1 ))
-    username="$user_cnt"
+    username="$cnt"
 fi
 
 # create email
-/usr/local/bin/addmailuser "$username@$domain"
-
+email="$username@$domain"
+/usr/local/bin/addmailuser "$email" "$password"
 
 # remove all inbox
 email_dir="/var/mail/$domain/$username/new/"
@@ -76,11 +82,12 @@ code1=$(echo "${reg}" | sed -n 3p)
 if [[ "$code1" == "" ]]
 then
 	echo "Already registered the email: $email."
-    if [[ "$user_cnt" != "" ]]
+    if [[ "$cnt" != "" ]]
     then
         # increment the counter
-        echo "$user_cnt" > "$user_cntfile"
-        echo "Incremented account counter $user_cnt"
+        echo "$cnt" > "$cntfile"
+
+        echo "Incremented account counter $cnt"
     fi
 	exit
 fi
@@ -88,7 +95,7 @@ fi
 #check if email containing code is there
 check_cnt=1
 function checkforcode {
-	sleep 2 # wait for email to arrive in inbox.
+	sleep 5 # wait for email to arrive in inbox.
 
     if (("$check_cnt" < "20"))
     then
@@ -97,7 +104,7 @@ function checkforcode {
         do
             #get line number of https://mega.nz/#confirm
             lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
-            code2=$(sudo sh -c "sed '$lineN!d' $i")
+            code2=$(sh -c "sed '$lineN!d' $i")
 
             #add .co to domain
             code2=${code2/mega.nz/mega.co.nz}
@@ -116,17 +123,14 @@ function checkforcode {
 checkforcode
 
 # run verifying code
-# cmd "${code1/@LINK@/$code2}" > /tmp/createMegaVerification
-# verifyCODE=$(</tmp/createMegaVerification)
-# rm /tmp/createMegaVerification
-verifyCODE=$(cmd "${code1/@LINK@/$code2}")
+verifyCODE=$(eval "${code1/@LINK@/$code2}")
 
 if [[ $verifyCODE == *"Account registered successfully!"* ]]
 then
     # increment counter
-	if [[ "$user_cnt" != "" ]]
+	if [[ "$cnt" != "" ]]
     then
-        echo "$user_cnt" > "$user_cntfile"
+        echo "$cnt" > "$cntfile"
     fi
 
 	echo "{'email': $email, 'password': $password}\n" >> /var/log/mega-accounts.log
