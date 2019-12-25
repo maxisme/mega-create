@@ -9,7 +9,7 @@ if [ -f $LOCKFILE ]; then
 else
 	touch $LOCKFILE
 fi
-trap rm -f $LOCKFILE
+trap $(rm -f $LOCKFILE)
 
 ##########
 # SCRIPT #
