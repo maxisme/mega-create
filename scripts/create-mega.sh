@@ -1,38 +1,5 @@
 #!/bin/bash
-###################
-# argument parser #
-###################
-while getopts "hd:e:" opt; do
-  case ${opt} in
-    h )
-      echo "Usage:"
-      echo "    -h                Display this help message."
-      echo "    -d                Domain for Mega account"
-      echo "    -e                Username to generate Mega account"
-      exit 0
-      ;;
-    d )
-      domain=$OPTARG
-      ;;
-    e )
-      username=$OPTARG
-      ;;
-    \? )
-      echo "Invalid Option: -$OPTARG" 1>&2
-      exit 1
-      ;;
-  esac
-done
-shift $((OPTIND -1))
-
-
-if [[ "$domain" == "" ]]
-then
-    echo "You must specify the email domain [-d]"
-    exit 1
-fi
-
-
+. ../.env
 ###############
 # lock script #
 ###############
@@ -43,16 +10,17 @@ if [ -f $LOCKFILE ]; then
 else
 	touch $LOCKFILE
 fi
-trap $(rm -f $LOCKFILE)
+trap rm -f $LOCKFILE
 
 ##########
 # SCRIPT #
 ##########
-password=`strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 50 | tr -d '\n'; echo`
+password=$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 50 | tr -d '\n'; echo)
 cntfile="/root/mega/cnt_$domain"
 
 mkdir -p /root/mega/
 
+username="$1"
 if [[ "$username" == "" ]]
 then
     # use incremental counter if no username specified
@@ -77,9 +45,9 @@ rm -rf "$email_dir*"
 reg=$(megareg --register --email "$email" --name "John Doe" --password "$password")
 
 # get verify code part 1
-code1=$(echo "${reg}" | sed -n 3p)
+part1=$(echo "${reg}" | sed -n 3p)
 
-if [[ "$code1" == "" ]]
+if [[ "$part1" == "" ]]
 then
 	echo "Already registered the email: $email."
     if [[ "$cnt" != "" ]]
@@ -104,11 +72,11 @@ function checkforcode {
         do
             #get line number of https://mega.nz/#confirm
             lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
-            code2=$(sh -c "sed '$lineN!d' $i")
+            part2=$(sh -c "sed '$lineN!d' $i")
 
             #add .co to domain
-            code2=${code2/mega.nz/mega.co.nz}
-            if [[ $code2 != *"mega"* ]]
+            part2=${part2/mega.nz/mega.co.nz}
+            if [[ $part2 != *"mega"* ]]
             then
                 echo "attempt" $check_cnt
                 check_cnt=$(( check_cnt + 1 ))
@@ -123,7 +91,8 @@ function checkforcode {
 checkforcode
 
 # run verifying code
-verifyCODE=$(eval "${code1/@LINK@/$code2}")
+echo "${part1/@LINK@/$part2}"
+verifyCODE=$(eval "${part1/@LINK@/$part2}")
 
 if [[ $verifyCODE == *"Account registered successfully!"* ]]
 then

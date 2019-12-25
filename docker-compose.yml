@@ -1,10 +1,10 @@
 version: '3'
 services:
-  mail:
+  mega-create:
     build: .
     hostname: mail
     domainname: ${DOMAINNAME}
-    container_name: mail
+    container_name: mega-create
     ports:
       - "25:25"
       - "143:143"
