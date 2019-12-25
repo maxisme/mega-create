@@ -9,6 +9,7 @@ RUN make
 RUN make install
 
 COPY scripts/* /usr/local/bin/
+RUN chmod +x scripts/*
 
 # clean up
 RUN rm -rf megatools*
