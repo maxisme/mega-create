@@ -9,7 +9,7 @@ RUN make
 RUN make install
 
 COPY scripts/* /usr/local/bin/
-RUN chmod +x /usr/local/bin/*
+RUN chmod +x /usr/local/bin/create-mega.sh
 
 # clean up
 RUN rm -rf megatools*
