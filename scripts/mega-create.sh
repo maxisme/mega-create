@@ -4,7 +4,7 @@
 ###############
 LOCKFILE="/tmp/creatingmega"
 if [ -f $LOCKFILE ]; then
-	echo "createNewMega already running"
+	echo "Script already running"
 	exit 1
 else
 	touch $LOCKFILE
@@ -48,15 +48,13 @@ part1=$(echo "${reg}" | sed -n 3p)
 
 if [[ "$part1" == "" ]]
 then
-	echo "Already registered the email: $email."
-    if [[ "$cnt" != "" ]]
+    if [[ "$username" == "" ]]
     then
         # increment the counter
         echo "$cnt" > "$cntfile"
-        echo "Incremented account counter to $cnt and retry"
         bash "$0"
-	    exit
     fi
+	exit
 fi
 
 #check if email containing code is there
@@ -77,7 +75,6 @@ function checkforcode {
             part2=${part2/mega.nz/mega.co.nz}
             if [[ $part2 != *"mega"* ]]
             then
-                echo "attempt" $check_cnt
                 check_cnt=$(( check_cnt + 1 ))
                 checkforcode
             fi
@@ -100,7 +97,6 @@ then
         echo "$cnt" > "$cntfile"
     fi
 
-	echo "{'email': $email, 'password': $password}\n" >> /var/log/mega-accounts.log
 	echo "{'email': $email, 'password': $password}"
 else
 	echo "failed registration: $verifyCODE"
