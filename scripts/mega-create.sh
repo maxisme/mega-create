@@ -36,6 +36,13 @@ fi
 email="$username@$DOMAINNAME"
 /usr/local/bin/addmailuser "$email" "$password"
 
+if [[ $? -eq 1 ]]
+then
+    echo "$cnt" > "$cntfile"
+    bash "$0"
+    exit
+fi
+
 # remove all inbox
 email_dir="/var/mail/$DOMAINNAME/$username/new/"
 rm -rf "$email_dir*"
@@ -48,12 +55,7 @@ part1=$(echo "${reg}" | sed -n 3p)
 
 if [[ "$part1" == "" ]]
 then
-    if [[ "$username" == "" ]]
-    then
-        # increment the counter
-        echo "$cnt" > "$cntfile"
-        bash "$0"
-    fi
+    echo $reg
 	exit
 fi
 
@@ -98,6 +100,8 @@ then
     fi
 
 	echo "{'email': $email, 'password': $password}"
+
+	rm -rf "/var/mail/$DOMAINNAME/*"
 else
 	echo "failed registration: $verifyCODE"
 fi
