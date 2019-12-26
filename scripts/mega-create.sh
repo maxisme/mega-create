@@ -53,10 +53,10 @@ then
     then
         # increment the counter
         echo "$cnt" > "$cntfile"
-
-        echo "Incremented account counter $cnt"
+        echo "Incremented account counter to $cnt and retry"
+        bash "$0"
+	    exit
     fi
-	exit
 fi
 
 #check if email containing code is there
