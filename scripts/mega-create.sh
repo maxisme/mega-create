@@ -90,7 +90,6 @@ function checkforcode {
 checkforcode
 
 # run verifying code
-echo "${part1/@LINK@/$part2}"
 verifyCODE=$(eval "${part1/@LINK@/$part2}")
 
 if [[ $verifyCODE == *"Account registered successfully!"* ]]
