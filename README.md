@@ -20,5 +20,4 @@ DOMAINNAME=example.com
 
 5. To allow mega account generation add a ssh public key, which can be found by running `docker exec -it mega-backup cat /root/.ssh/id_rsa.pub` on the host(s) where you are running the [mega-backup](https://github.com/maxisme/mega-backup) to `.ssh/authorized_keys`.
 
-
-
+6. Start `docker-compose up -d`
