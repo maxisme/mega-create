@@ -8,7 +8,7 @@ ____
 
 2. Create .env with domain name
 ```
-DOMAINNAME=mail.example.com
+DOMAINNAME=example.com
 ```
 
 3. set `OVERRIDE_HOSTNAME=` in `env-mailserver` to `mail.example.com`
@@ -18,6 +18,7 @@ DOMAINNAME=mail.example.com
 
 ![cloudflare](images/cloudflare.png)
 
+5. To allow mega account generation add a ssh public key, which can be found by running `docker exec -it mega-backup cat /root/.ssh/id_rsa.pub` on the host(s) where you are running the [mega-backup](https://github.com/maxisme/mega-backup) to `.ssh/authorized_keys`.
 
 
 

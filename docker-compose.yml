@@ -2,10 +2,11 @@ version: '3'
 services:
   mega-create:
     build: .
-    hostname: mail
+    hostname: mega-create
     domainname: ${DOMAINNAME}
     container_name: mega-create
     ports:
+      - "6622:22"
       - "25:25"
       - "143:143"
       - "587:587"
@@ -15,6 +16,7 @@ services:
       - mailstate:/var/mail-state
       - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
+      - ./ssh/authorized_keys:/home/megajail/.ssh/authorized_keys
     env_file:
       - .env
       - env-mailserver

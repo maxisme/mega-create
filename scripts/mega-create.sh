@@ -16,6 +16,7 @@ trap $(rm -f $LOCKFILE)
 ##########
 password=$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 50 | tr -d '\n'; echo)
 cntfile="/root/mega/cnt_$DOMAINNAME"
+touch "$cntfile" 2> /dev/null
 
 mkdir -p /root/mega/
 
@@ -55,8 +56,9 @@ part1=$(echo "${reg}" | sed -n 3p)
 
 if [[ "$part1" == "" ]]
 then
-    echo $reg
-	exit
+    echo "$cnt" > "$cntfile"
+    bash "$0"
+    exit
 fi
 
 #check if email containing code is there
@@ -99,7 +101,7 @@ then
         echo "$cnt" > "$cntfile"
     fi
 
-	echo "{'email': $email, 'password': $password}"
+	echo "{\"email\": \"$email\", \"password\": \"$password\"}"
 
 	rm -rf "/var/mail/$DOMAINNAME/*"
 else
