@@ -5,7 +5,7 @@ services:
     hostname: mega-create
     domainname: ${DOMAINNAME}
     container_name: mega-create
-    command: "service ssh restart && supervisord -c /etc/supervisor/supervisord.conf"
+    command: "bash -c 'service ssh restart && supervisord -c /etc/supervisor/supervisord.conf'"
     ports:
       - "6622:22"
       - "25:25"
