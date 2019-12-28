@@ -25,6 +25,3 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 
 COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
-
-EXPOSE 22
-CMD ["service", "ssh", "restart"]

@@ -5,6 +5,7 @@ services:
     hostname: mega-create
     domainname: ${DOMAINNAME}
     container_name: mega-create
+    command: "/usr/sbin/sshd -D"
     ports:
       - "6622:22"
       - "25:25"
