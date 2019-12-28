@@ -11,8 +11,7 @@ RUN make install
 # create jailed ssh user
 RUN useradd megajail
 RUN mkdir -p /home/megajail/.ssh
-RUN echo "Match User megajail \
-    ChrootDirectory /home/megajail" >> /etc/ssh/sshd_config
+RUN echo -e "Match User megajail\nChrootDirectory /home/megajail" >> /etc/ssh/sshd_config
 RUN touch /home/megajail/.ssh/authorized_keys
 RUN service ssh restart
 
