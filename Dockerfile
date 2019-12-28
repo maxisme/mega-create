@@ -14,7 +14,9 @@ RUN useradd megajail
 RUN mkdir -p /home/megajail/.ssh
 RUN echo -e "Match User megajail\nChrootDirectory /home/megajail" >> /etc/ssh/sshd_config
 RUN touch /home/megajail/.ssh/authorized_keys
-RUN service ssh start
 
 COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
+
+RUN mkdir /var/run/sshd
+CMD ['/usr/sbin/sshd', '-D']
