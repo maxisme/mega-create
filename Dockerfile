@@ -25,3 +25,5 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 
 COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
+
+ENTRYPOINT service ssh restart && supervisord -c /etc/supervisor/supervisord.conf
