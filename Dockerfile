@@ -13,7 +13,7 @@ RUN useradd megajail
 RUN mkdir -p /home/megajail/.ssh
 RUN echo "Match User megajail \
     ChrootDirectory /home/megajail" >> /etc/ssh/sshd_config
-COPY .ssh/authorized_keys /home/megajail/.ssh/authorized_keys
+RUN touch /home/megajail/.ssh/authorized_keys
 RUN service ssh restart
 
 # clean up

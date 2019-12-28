@@ -16,7 +16,7 @@ services:
       - mailstate:/var/mail-state
       - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
-      - ./ssh/:/home/megajail/.ssh/
+      - ./.ssh/authorized_keys:/home/megajail/.ssh/authorized_keys
     env_file:
       - .env
       - env-mailserver
