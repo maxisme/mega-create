@@ -18,5 +18,4 @@ RUN touch /home/megajail/.ssh/authorized_keys
 COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
 
-RUN mkdir /var/run/sshd
-CMD ['/usr/sbin/sshd', '-D']
+CMD /usr/sbin/sshd -D
