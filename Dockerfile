@@ -13,6 +13,7 @@ RUN rm -rf megatools*
 RUN useradd megajail
 RUN mkdir -p /home/megajail/.ssh
 RUN echo -e "Match User megajail\nChrootDirectory /home/megajail" >> /etc/ssh/sshd_config
+RUN echo -e 'PermitRootLogin no\nPasswordAuthentication no\n' >> /etc/ssh/sshd_config
 RUN touch /home/megajail/.ssh/authorized_keys
 
 COPY scripts/mega-create.sh /usr/local/bin/
