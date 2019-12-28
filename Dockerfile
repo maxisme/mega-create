@@ -12,6 +12,7 @@ RUN rm -rf megatools*
 # create jailed ssh user
 RUN useradd megajail
 RUN mkdir -p /home/megajail/.ssh
+RUN mkdir /var/run/sshd
 RUN echo -e "Match User megajail\nChrootDirectory /home/megajail" >> /etc/ssh/sshd_config
 RUN echo -e 'PermitRootLogin no\nPasswordAuthentication no\n' >> /etc/ssh/sshd_config
 RUN touch /home/megajail/.ssh/authorized_keys
@@ -19,4 +20,5 @@ RUN touch /home/megajail/.ssh/authorized_keys
 COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
 
-ENTRYPOINT /usr/sbin/sshd -D
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
