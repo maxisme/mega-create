@@ -27,4 +27,4 @@ COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
 
 EXPOSE 22
-CMD ["/usr/sbin/sshd", "-D"]
+CMD ["service", "ssh", "restart"]
