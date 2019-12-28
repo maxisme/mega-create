@@ -19,4 +19,4 @@ RUN touch /home/megajail/.ssh/authorized_keys
 COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
 
-CMD service ssh start && while true; do sleep 3000; done
+CMD ["/usr/sbin/sshd", "-D"]
