@@ -19,4 +19,4 @@ RUN touch /home/megajail/.ssh/authorized_keys
 COPY scripts/mega-create.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/mega-create.sh
 
-CMD ["/usr/sbin/sshd", "-D"]
+ENTRYPOINT service ssh restart && bash
