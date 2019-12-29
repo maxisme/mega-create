@@ -15,8 +15,7 @@ trap $(rm -f $LOCKFILE)
 # SCRIPT #
 ##########
 password=$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 50 | tr -d '\n'; echo)
-mkdir -p /root/mega/
-cntfile="/root/mega/cnt_$DOMAINNAME"
+cntfile="/.mega_cnt_$DOMAINNAME"
 touch "$cntfile" 2> /dev/null
 
 username="$1"
