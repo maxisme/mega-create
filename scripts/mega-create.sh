@@ -59,7 +59,7 @@ then
     exit
 fi
 
-sleep 2
+sleep 10
 
 # look for verify email in inbox with verify code part2
 for i in "$email_dir"*
