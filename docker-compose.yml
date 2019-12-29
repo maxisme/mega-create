@@ -18,6 +18,7 @@ services:
       - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
       - ./.ssh/authorized_keys:/home/megajail/.ssh/authorized_keys
+      - ./scripts/mega-create.sh:/usr/local/bin/mega-create.sh
     env_file:
       - .env
       - env-mailserver
