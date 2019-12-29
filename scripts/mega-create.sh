@@ -59,34 +59,22 @@ then
     exit
 fi
 
-#check if email containing code is there
-check_cnt=1
-function checkforcode {
-	sleep 5 # wait for email to arrive in inbox.
+sleep 2
 
-    if (("$check_cnt" < "20"))
+# look for verify email in inbox with verify code part2
+for i in "$email_dir"*
+do
+    #get line number of https://mega.nz/#confirm
+    lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
+    part2=$(sh -c "sed '$lineN!d' $i")
+
+    #add .co to domain
+    part2=${part2/mega.nz/mega.co.nz}
+    if [[ $part2 != *"mega"* ]]
     then
-        # look for verify email in inbox with verify code part 2
-        for i in "$email_dir"*
-        do
-            #get line number of https://mega.nz/#confirm
-            lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
-            part2=$(sh -c "sed '$lineN!d' $i")
-
-            #add .co to domain
-            part2=${part2/mega.nz/mega.co.nz}
-            if [[ $part2 != *"mega"* ]]
-            then
-                check_cnt=$(( check_cnt + 1 ))
-                checkforcode
-            fi
-        done
-    else
-        echo "No email received from mega!"
-        exit
+        bash "$0"
     fi
-}
-checkforcode
+done
 
 # run verifying code
 verifyCODE=$(eval "${part1/@LINK@/$part2}")
