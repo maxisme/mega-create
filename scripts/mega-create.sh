@@ -59,7 +59,7 @@ then
     exit
 fi
 
-sleep 10
+sleep 5
 
 # look for verify email in inbox with verify code part2
 for i in "$email_dir"*
@@ -72,6 +72,8 @@ do
     part2=${part2/mega.nz/mega.co.nz}
     if [[ $part2 != *"mega"* ]]
     then
+        # failed to receive email in time just try again with new account
+        echo "$cnt" > "$cntfile"
         bash "$0"
         exit
     fi
