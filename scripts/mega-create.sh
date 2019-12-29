@@ -73,6 +73,7 @@ do
     if [[ $part2 != *"mega"* ]]
     then
         bash "$0"
+        exit
     fi
 done
 
