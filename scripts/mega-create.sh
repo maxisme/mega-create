@@ -37,8 +37,6 @@ fi
 email="$username@$domain"
 /usr/local/bin/addmailuser "$email" "$password"
 
-sleep 2
-
 # remove all inbox
 email_dir="/var/mail/$domain/$username/new/"
 rm -rf "$email_dir*"
