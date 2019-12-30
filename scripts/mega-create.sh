@@ -1,4 +1,6 @@
 #!/bin/bash
+domain="$(<"/.mega_domain")"
+
 ###############
 # lock script #
 ###############
@@ -15,7 +17,7 @@ trap $(rm -f $LOCKFILE)
 # SCRIPT #
 ##########
 password=$(strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 50 | tr -d '\n'; echo)
-cntfile="/.mega_cnt_$DOMAINNAME"
+cntfile="/.mega_cnt"
 touch "$cntfile" 2> /dev/null
 
 username="$1"
@@ -32,13 +34,13 @@ then
 fi
 
 # create email
-email="$username@$DOMAINNAME"
+email="$username@$domain"
 /usr/local/bin/addmailuser "$email" "$password"
 
 sleep 2
 
 # remove all inbox
-email_dir="/var/mail/$DOMAINNAME/$username/new/"
+email_dir="/var/mail/$domain/$username/new/"
 rm -rf "$email_dir*"
 
 # account creation with same password generated for email

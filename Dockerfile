@@ -9,7 +9,7 @@ RUN make
 RUN make install
 RUN rm -rf megatools*
 
-# create jailed ssh user
+# ssh
 RUN mkdir /var/run/sshd
 RUN echo -e "PasswordAuthentication no\nPort 6622\n" >> /etc/ssh/sshd_config
 RUN echo -e "Match User root\nForceCommand bash /usr/local/bin/mega-create.sh" >> /etc/ssh/sshd_config
