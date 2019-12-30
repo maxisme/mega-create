@@ -35,12 +35,7 @@ fi
 email="$username@$DOMAINNAME"
 /usr/local/bin/addmailuser "$email" "$password"
 
-if [[ $? -eq 1 ]]
-then
-    echo "$cnt" > "$cntfile"
-    bash "$0"
-    exit
-fi
+sleep 2
 
 # remove all inbox
 email_dir="/var/mail/$DOMAINNAME/$username/new/"
@@ -51,10 +46,14 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
-
-if [[ "$part1" == "" ]]
+if [[ $part1 == *"EEXIST"* ]]
 then
+    echo "already exists"
     echo "$cnt" > "$cntfile"
+    bash "$0"
+    exit
+elif [[ "$part1" == "" ]]
+then
     bash "$0"
     exit
 fi
@@ -73,7 +72,6 @@ do
     if [[ $part2 != *"mega"* ]]
     then
         # failed to receive email in time just try again with new account
-        echo "$cnt" > "$cntfile"
         bash "$0"
         exit
     fi

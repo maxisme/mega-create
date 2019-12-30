@@ -10,9 +10,7 @@ RUN make install
 RUN rm -rf megatools*
 
 # create jailed ssh user
-RUN useradd megajail -s /bin/bash
-RUN mkdir -p /home/megajail/.ssh
 RUN mkdir /var/run/sshd
 RUN echo -e "PermitRootLogin no\nPasswordAuthentication no\nPort 6622\n" >> /etc/ssh/sshd_config
-RUN echo -e "Match User megajail\nForceCommand bash /usr/local/bin/mega-create.sh" >> /etc/ssh/sshd_config
+RUN echo -e "Match User root\nForceCommand bash /usr/local/bin/mega-create.sh" >> /etc/ssh/sshd_config
 RUN touch /home/megajail/.ssh/authorized_keys
