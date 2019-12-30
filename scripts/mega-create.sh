@@ -46,14 +46,10 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
-if [[ $part1 == *"EEXIST"* ]]
+if [[ "$part1" == "" ]]
 then
     echo "already exists"
     echo "$cnt" > "$cntfile"
-    bash "$0"
-    exit
-elif [[ "$part1" == "" ]]
-then
     bash "$0"
     exit
 fi
