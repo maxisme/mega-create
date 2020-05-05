@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "Dockerfile"
+      - "scripts/**"
+      - ".github/workflows/push.yml"
 
 jobs:
   publish:

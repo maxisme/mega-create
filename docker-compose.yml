@@ -1,7 +1,7 @@
 version: '3'
 services:
   mega-create:
-    build: .
+    image: maxisme/mega-create
     domainname: ${DOMAINNAME:?err}
     command: "bash -c 'echo ${DOMAINNAME} > /.mega_domain && service ssh restart && supervisord -c /etc/supervisor/supervisord.conf'"
     ports:
