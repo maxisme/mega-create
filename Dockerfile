@@ -12,3 +12,5 @@ RUN make install
 RUN rm -rf megatools*
 
 ADD scripts/mega-create.sh /usr/local/bin/mega-create.sh
+
+CMD supervisord -c /etc/supervisor/supervisord.conf

@@ -61,9 +61,10 @@ sleep 5
 for i in "$email_dir"*; do
   # get line number of https://mega.nz/#confirm
   lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
+  # extract part2 of verification code
   part2=$(sh -c "sed '$lineN!d' $i")
 
-  # add .co to domain
+  # use different domain
   part2=${part2/mega.nz/mega.co.nz}
   if [[ $part2 != *"mega"* ]]; then
     # failed to receive email in time so try again with new account
