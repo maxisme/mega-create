@@ -48,7 +48,7 @@ services:
 
 
 volumes:
-  maildata:`
+  maildata:
     driver: local
   mailstate:
     driver: local
