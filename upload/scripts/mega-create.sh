@@ -1,5 +1,5 @@
 #!/bin/bash
-domain="$(<"/.mega_domain")"
+domain="$domainname"
 
 ###############
 # lock script #
@@ -20,23 +20,15 @@ password=$(
   strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 50 | tr -d '\n'
   echo
 )
-cntfile="/.mega_cnt"
-touch "$cntfile" 2>/dev/null
 
 username="$1"
 if [[ "$username" == "" ]]; then
-  # use incremental counter if no username specified
-  cnt=$(<"$cntfile")
-  if [[ "$cnt" == "" ]]; then
-    cnt=0
-  fi
-  cnt=$((cnt + 1))
-  username="$cnt"
+  username=$(date +%s%N)
 fi
 
 # create email
 email="$username@$domain"
-/usr/local/bin/addmailuser "$email" "$password"
+/usr/bin/local/add-user.sh "$email" "$password"
 
 # remove all inbox
 email_dir="/var/mail/$domain/$username/new/"

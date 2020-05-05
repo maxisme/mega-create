@@ -39,9 +39,7 @@ func createMegaAccount() (user MegaAccount, err error) {
 	if err != nil {
 		return
 	}
-	if err := json.Unmarshal(out, &user); err != nil {
-		return
-	}
+	err = json.Unmarshal(out, &user)
 	return
 }
 
@@ -77,7 +75,7 @@ func (p *MegaAccountPool) getMegaAccount() (*MegaAccount, error) {
 	for _, account := range p.pool {
 		if account.storage.Cstrg > maxBytesLeft {
 			maxBytesLeft = account.storage.Cstrg
-			maxAccount = account
+			maxAccount = *account
 		}
 	}
 

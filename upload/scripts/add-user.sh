@@ -1,0 +1,41 @@
+#! /bin/bash
+
+DATABASE=${DATABASE:-/email-config/postfix-accounts.cf}
+
+USER="$1"
+shift
+PASSWD="$@"
+
+usage() {
+	echo "Usage: addmailuser <user@domain> [<password>]"
+}
+
+errex() {
+	echo "$@" 1>&2
+	exit 1
+}
+
+escape() {
+	echo "${1//./\\.}"
+}
+
+[ -z "$USER" ] && { usage; errex "no username specified"; }
+expr index "$USER" "@" >/dev/null || { usage; errex "username must include the domain"; }
+
+# Protect config file with lock to avoid race conditions
+touch $DATABASE
+(
+  flock -e 200
+
+  grep -qi "^$(escape "$USER")|" $DATABASE 2>/dev/null &&
+    errex "User \"$USER\" already exists"
+
+  if [ -z "$PASSWD" ]; then
+    read -s -p "Enter Password: " PASSWD
+    echo
+    [ -z "$PASSWD" ] && errex "Password must not be empty"
+  fi
+
+  HASH="$(doveadm pw -s SHA512-CRYPT -u "$USER" -p "$PASSWD")"
+  echo "$USER|$HASH" >> $DATABASE
+) 200<$DATABASE
