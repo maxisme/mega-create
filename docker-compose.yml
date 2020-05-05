@@ -10,30 +10,22 @@ services:
       - "143:143"
       - "587:587"
       - "993:993"
-      volumes:
-        - maildata:/var/mail
-        - mailstate:/var/mail-state
-        - maillogs:/var/log/mail
-        - ./config/:/tmp/docker-mailserver/
-      environment:
-        - ENABLE_SPAMASSASSIN=0
-        - SPAMASSASSIN_SPAM_TO_INBOX=0
-        - ENABLE_CLAMAV=0
-        - ENABLE_FAIL2BAN=0
-        - ENABLE_POSTGREY=0
-        - ONE_DIR=0
-        - DMS_DEBUG=0
-      cap_add:
-        - NET_ADMIN
-        - SYS_PTRACE
-
     volumes:
-      maildata:
-        driver: local
-      mailstate:
-        driver: local
-      maillogs:
-        driver: local
+      - maildata:/var/mail
+      - mailstate:/var/mail-state
+      - maillogs:/var/log/mail
+      - ./config/:/tmp/docker-mailserver/
+    environment:
+      - ENABLE_SPAMASSASSIN=0
+      - SPAMASSASSIN_SPAM_TO_INBOX=0
+      - ENABLE_CLAMAV=0
+      - ENABLE_FAIL2BAN=0
+      - ENABLE_POSTGREY=0
+      - ONE_DIR=0
+      - DMS_DEBUG=0
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
 
 #  mega-create:
 #    build: .
@@ -52,3 +44,13 @@ services:
 #    ports:
 #      - "3307:22"
 #    restart: always
+
+
+
+volumes:
+  maildata:`
+    driver: local
+  mailstate:
+    driver: local
+  maillogs:
+    driver: local
