@@ -35,20 +35,20 @@ services:
       maillogs:
         driver: local
 
-  mega-create:
-    build: .
-    domainname: ${DOMAINNAME:?err}
-    env_file:
-      - .env
-    cap_add:
-      - NET_ADMIN
-      - SYS_PTRACE
-    restart: always
-
-  sshd:
-    image: maxisme/sshd:latest
-    volumes:
-      - "~/.ssh:/root/.ssh"
-    ports:
-      - "3307:22"
-    restart: always
+#  mega-create:
+#    build: .
+#    domainname: ${DOMAINNAME:?err}
+#    env_file:
+#      - .env
+#    cap_add:
+#      - NET_ADMIN
+#      - SYS_PTRACE
+#    restart: always
+#
+#  sshd:
+#    image: maxisme/sshd:latest
+#    volumes:
+#      - "~/.ssh:/root/.ssh"
+#    ports:
+#      - "3307:22"
+#    restart: always
