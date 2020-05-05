@@ -1,16 +1,20 @@
-FROM tvial/docker-mailserver
-
+FROM alpine
 ARG mega_version=1.10.3
 
-# install megatools on top of mailserver
-RUN apt-get update && apt-get install -y build-essential libglib2.0-dev libssl-dev libcurl4-openssl-dev wget
+# install dovecot
+RUN apk add --update dovecot
+#COPY dovecot/dovecot.conf /etc/dovecot/dovecot.conf
+
+# install megatools
+RUN apk add --update build-base libcurl curl-dev openssl-dev glib-dev glib libtool automake autoconf wget tar
 RUN wget https://megatools.megous.com/builds/megatools-$mega_version.tar.gz
 RUN tar -xzf megatools-$mega_version.tar.gz
 RUN bash megatools-$mega_version/configure --disable-docs
-RUN make
+RUN make -j4
 RUN make install
 RUN rm -rf megatools*
 
-ADD scripts/mega-create.sh /usr/local/bin/mega-create.sh
+ADD scripts/* /usr/local/bin/
+RUN chmod +x /usr/local/bin/*
 
-CMD supervisord -c /etc/supervisor/supervisord.conf
+CMD ["/usr/sbin/dovecot", "-F"]
