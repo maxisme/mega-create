@@ -1,23 +1,24 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/robfig/cron/v3"
 	"github.com/t3rm1n4l/go-mega"
 	"io/ioutil"
 	"log"
 	"mime"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"sync"
 )
 
-const maxUploadSize = 9 * 1024 * 1024 * 1024 // 10 GB
+const maxUploadSize = 1 * 1024 * 1024 * 1024 // 1 GB
 const uploadPath = "./tmp"
 
 type Server struct {
-	m *mega.Mega
+	m    *mega.Mega
+	pool *MegaAccountPool
 }
 
 func main() {
@@ -26,7 +27,21 @@ func main() {
 		panic(err)
 	}
 
-	s := Server{m}
+	var p []*MegaAccount
+	pool := MegaAccountPool{
+		p,
+		sync.RWMutex{},
+		sync.WaitGroup{},
+	}
+
+	s := Server{m, &pool}
+
+	// cron
+	c := cron.New()
+	_, _ = c.AddFunc("1 * * * *", pool.managePool)
+	c.Start()
+
+	// web handlers
 	http.HandleFunc("/upload", s.uploadFileHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -81,58 +96,11 @@ func (s *Server) uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// write file to mega
-	// read username and password from file
-	userBytes, _ := ioutil.ReadFile("/.username")
-	passBytes, _ := ioutil.ReadFile("/.password")
-	if err := s.m.Login(string(userBytes), string(passBytes)); err != nil {
-		user, err := megaCreate()
-		if err != nil {
-			log.Println(err.Error())
-			renderError(w, "FAILED_CREATING_ACCOUNT", http.StatusInternalServerError)
-			return
-		}
-		if err := s.m.Login(user.Email, user.Password); err != nil {
-			log.Println(err.Error())
-			renderError(w, "FAILED_LOGGING_IN_NEW_ACCOUNT", http.StatusInternalServerError)
-			return
-		}
-	}
 
-	// get space left
-	q, err := s.m.GetQuota()
-	if err != nil {
-		panic(err)
-	}
-	if q.Mstrg-(uint64(fileHeader.Size)+q.Cstrg) <= 0 {
-		log.Printf("Total allowed %d Left %d Upload %d", q.Mstrg, q.Cstrg, fileHeader.Size)
-		renderError(w, "FILE_TOO_BIG_FOR_MEGA", http.StatusBadRequest)
-		return
-	}
-
-	n, err := m.UploadFile(newPath, m.FS.GetRoot(), r.Form.Get("name"), nil)
-	if err != nil {
-
-	}
 	w.Write([]byte("SUCCESS"))
 }
 
 func renderError(w http.ResponseWriter, message string, statusCode int) {
 	w.WriteHeader(http.StatusBadRequest)
 	w.Write([]byte(message))
-}
-
-type MegaNewUser struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-func megaCreate() (user MegaNewUser, err error) {
-	out, err := exec.Command("mega-create.sh").Output()
-	if err != nil {
-		return
-	}
-	if err := json.Unmarshal(out, &user); err != nil {
-		return
-	}
-	return
 }
