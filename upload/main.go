@@ -38,7 +38,10 @@ func main() {
 
 	// cron
 	c := cron.New()
-	_, _ = c.AddFunc("1 * * * *", pool.managePool)
+	_, err := c.AddFunc("* * * * *", pool.managePool)
+	if err != nil {
+		panic(err)
+	}
 	c.Start()
 
 	// web handlers
@@ -86,6 +89,7 @@ func (s *Server) uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	// write file
 	newFile, err := os.Create(newPath)
 	if err != nil {
+		log.Println(err.Error())
 		renderError(w, "CANT_WRITE_FILE", http.StatusInternalServerError)
 		return
 	}
@@ -96,6 +100,18 @@ func (s *Server) uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// write file to mega
+	acnt, err := s.pool.getMegaAccount()
+	if err != nil {
+		log.Println(err.Error())
+		renderError(w, "CANT_FIND_MEGA_ACNT", http.StatusInternalServerError)
+		return
+	}
+	err = UploadFileToMega(acnt, uint64(fileHeader.Size), newPath, r.Form.Get("mega_path"))
+	if err != nil {
+		log.Println(err.Error())
+		renderError(w, "PROBLEM_UPLOADING", http.StatusInternalServerError)
+		return
+	}
 
 	w.Write([]byte("SUCCESS"))
 }
