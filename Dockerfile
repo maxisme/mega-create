@@ -1,16 +1,14 @@
 FROM tvial/docker-mailserver
 
+ARG mega_version=1.10.3
+
 # install megatools on top of mailserver
-RUN apt-get update && apt-get install -y build-essential libglib2.0-dev libssl-dev libcurl4-openssl-dev wget openssh-server
-RUN wget https://megatools.megous.com/builds/megatools-1.10.2.tar.gz
-RUN tar -xzf megatools-1.10.2.tar.gz
-RUN bash megatools-1.10.2/configure --disable-docs
+RUN apt-get update && apt-get install -y build-essential libglib2.0-dev libssl-dev libcurl4-openssl-dev wget
+RUN wget https://megatools.megous.com/builds/megatools-$mega_version.tar.gz
+RUN tar -xzf megatools-$mega_version.tar.gz
+RUN bash megatools-$mega_version/configure --disable-docs
 RUN make
 RUN make install
 RUN rm -rf megatools*
 
-# ssh
-RUN mkdir /var/run/sshd
-RUN echo -e "PasswordAuthentication no\nPort 6622\n" >> /etc/ssh/sshd_config
-RUN echo -e "Match User root\nForceCommand bash /usr/local/bin/mega-create.sh" >> /etc/ssh/sshd_config
-RUN mkdir -p /root/.ssh
+ADD scripts/mega-create.sh /usr/local/bin/mega-create.sh
