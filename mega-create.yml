@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.1'
 services:
   mega-create:
     image: maxisme/mega-create
@@ -8,12 +8,13 @@ services:
       - "143:143"
       - "587:587"
       - "993:993"
+    volumes:
+      - ./config/:/tmp/docker-mailserver/
     env_file:
       - .env
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
-    restart: always
 
   sshd:
     image: maxisme/sshd:latest
@@ -21,4 +22,3 @@ services:
       - "~/.ssh:/root/.ssh"
     ports:
       - "3307:22"
-    restart: always
