@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   mega-create:
-    build: .
+    image: maxisme/mega-create
     domainname: ${DOMAINNAME:?err}
     ports:
       - "25:25"
