@@ -39,15 +39,9 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
-if [[ "$part1" == "" ]]; then
-  echo "already exists"
-  echo "$cnt" >"$cntfile"
-  bash "$0"
-  exit
-fi
 
 # wait for email...
-sleep 5
+sleep 10
 
 # look for verify email in inbox with verify code part2
 for i in "$email_dir"*; do
