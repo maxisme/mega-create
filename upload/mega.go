@@ -36,10 +36,11 @@ func (p *MegaAccountPool) FillPool() {
 			account, err := p.GenMegaAccount()
 			if err != nil {
 				log.Println(err.Error())
+			} else {
+				p.Lock()
+				p.pool = append(p.pool, account)
+				p.Unlock()
 			}
-			p.Lock()
-			p.pool = append(p.pool, account)
-			p.Unlock()
 		}
 		log.Println("Finished filling...")
 		p.isFilling = false
