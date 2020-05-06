@@ -61,4 +61,5 @@ if [[ $verifyCODE == *"Account registered successfully!"* ]]; then
   rm -rf "/var/mail/$DOMAINNAME/*"
 else
   echo "failed registration: $verifyCODE"
+  exit 1
 fi

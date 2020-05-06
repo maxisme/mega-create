@@ -31,19 +31,14 @@ func (p *MegaAccountPool) FillPool() {
 		log.Println("Started filling...")
 		p.isFilling = true
 		for i := 0; i < accountPoolSize-len(p.pool); i++ {
-			go func() {
-				p.Add(1)
-				defer p.Done()
-				account, err := GenMegaAccount()
-				if err != nil {
-					log.Println(err.Error())
-				}
-				p.Lock()
-				p.pool = append(p.pool, account)
-				p.Unlock()
-			}()
+			account, err := GenMegaAccount()
+			if err != nil {
+				log.Println(err.Error())
+			}
+			p.Lock()
+			p.pool = append(p.pool, account)
+			p.Unlock()
 		}
-		p.Wait()
 		log.Println("Finished filling...")
 		p.isFilling = false
 	} else {
