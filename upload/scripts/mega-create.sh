@@ -1,5 +1,5 @@
 #!/bin/bash
-domain="$domainname"
+domain="$DOMAINNAME"
 
 ###############
 # lock script #

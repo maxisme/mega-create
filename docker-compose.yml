@@ -31,7 +31,8 @@ services:
     build:
       context: upload
     environment:
-      domainname: ${DOMAINNAME:?err}
+      DOMAINNAME: ${DOMAINNAME:?err}
+      CREDENTIALS: ${CREDENTIALS:?err}
     volumes:
       - maildata:/var/mail
       - ./config/:/email-config/
