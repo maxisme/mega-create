@@ -1,18 +1,6 @@
 #!/bin/bash
 domain="$DOMAINNAME"
 
-###############
-# lock script #
-###############
-LOCKFILE="/tmp/creatingmega"
-if [ -f $LOCKFILE ]; then
-  echo "Script already running"
-  exit 1
-else
-  touch $LOCKFILE
-fi
-trap $(rm -f $LOCKFILE)
-
 ##########
 # SCRIPT #
 ##########
@@ -74,6 +62,3 @@ if [[ $verifyCODE == *"Account registered successfully!"* ]]; then
 else
   echo "failed registration: $verifyCODE"
 fi
-
-# finished running
-rm -f $LOCKFILE
