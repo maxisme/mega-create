@@ -70,10 +70,11 @@ func (p *MegaAccountPool) GetMegaAccount() (account *MegaAccount) {
 		if err != nil {
 			log.Println(err)
 		}
+	} else {
+		p.Lock()
+		account, p.pool = p.pool[0], p.pool[1:]
+		p.Unlock()
 	}
-	p.Lock()
-	account, p.pool = p.pool[0], p.pool[1:]
-	p.Unlock()
 	return
 }
 
