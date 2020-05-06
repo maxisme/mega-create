@@ -29,7 +29,7 @@ services:
     restart: always
 
   mega-create:
-    hostname: mega
+    container_name: mega
     build:
       context: upload
     ports:
