@@ -30,6 +30,8 @@ services:
   mega-create:
     build:
       context: upload
+    ports:
+      - "8980:8080"
     environment:
       DOMAINNAME: ${DOMAINNAME:?err}
       CREDENTIALS: ${CREDENTIALS:?err}
@@ -44,23 +46,23 @@ services:
       - "traefik.http.routers.mega.tls.certresolver=myresolver"
       - "traefik.http.services.mega.loadbalancer.server.port=8080"
 
-  traefik:
-    image: "traefik:v2.2"
-    container_name: "traefik"
-    command:
-#      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=postmaster@example.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-    ports:
-      - "443:443"
-#      - "8080:8080"
-    volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#  traefik:
+#    image: "traefik:v2.2"
+#    container_name: "traefik"
+#    command:
+##      - "--api.insecure=true"
+#      - "--providers.docker=true"
+#      - "--providers.docker.exposedbydefault=false"
+#      - "--entrypoints.websecure.address=:443"
+#      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+#      - "--certificatesresolvers.myresolver.acme.email=postmaster@example.com"
+#      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+#    ports:
+#      - "443:443"
+##      - "8080:8080"
+#    volumes:
+#      - "./letsencrypt:/letsencrypt"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 volumes:
   maildata:
