@@ -22,6 +22,10 @@ type Server struct {
 }
 
 func main() {
+	if os.Getenv("CREDENTIALS") == "" {
+		panic("No environment variable CREDENTIALS")
+	}
+
 	m := mega.New()
 	if err := m.SetUploadWorkers(4); err != nil {
 		panic(err)
@@ -46,7 +50,33 @@ func main() {
 
 	// web handlers
 	http.HandleFunc("/upload", s.uploadFileHandler)
+	http.HandleFunc("/code", s.newCodeHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func (s *Server) newCodeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		renderError(w, "CANT_PARSE_FORM", http.StatusInternalServerError)
+		return
+	}
+
+	if r.Form.Get("credentials") != os.Getenv("CREDENTIALS") {
+		renderError(w, "CANT_PARSE_FORM", http.StatusInternalServerError)
+		return
+	}
+
+	out, err := CreateMegaAccount()
+	if err != nil {
+		renderError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(out)
 }
 
 func (s *Server) uploadFileHandler(w http.ResponseWriter, r *http.Request) {

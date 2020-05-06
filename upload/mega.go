@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/t3rm1n4l/go-mega"
 	"log"
+	"os/exec"
 	"sync"
 )
 
@@ -26,7 +27,7 @@ type MegaAccount struct {
 func (p *MegaAccountPool) managePool() {
 	log.Println("starting manager")
 	for i := 0; i < accountPoolSize-len(p.pool); i++ {
-		account, err := createMegaAccount()
+		account, err := addMegaAccount()
 		if err != nil {
 			log.Println(err.Error())
 		}
@@ -35,8 +36,12 @@ func (p *MegaAccountPool) managePool() {
 	}
 }
 
-func createMegaAccount() (user MegaAccount, err error) {
-	//out, err := exec.Command("mega-create.sh").Output()
+func CreateMegaAccount() ([]byte, error) {
+	return exec.Command("mega-create.sh").Output()
+}
+
+func addMegaAccount() (user MegaAccount, err error) {
+	//out, err := CreateMegaAccount()
 	//if err != nil {
 	//	return
 	//}
