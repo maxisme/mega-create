@@ -37,6 +37,7 @@ func main() {
 	pool := MegaAccountPool{
 		p,
 		false,
+		false,
 		sync.RWMutex{},
 		sync.WaitGroup{},
 	}

@@ -7,13 +7,15 @@ import (
 	"log"
 	"os/exec"
 	"sync"
+	"time"
 )
 
 const accountPoolSize = 20
 
 type MegaAccountPool struct {
-	pool      []*MegaAccount
-	isFilling bool
+	pool                []*MegaAccount
+	isFilling           bool
+	isGeneratingAccount bool
 	sync.RWMutex
 	sync.WaitGroup
 }
@@ -31,7 +33,7 @@ func (p *MegaAccountPool) FillPool() {
 		log.Println("Started filling...")
 		p.isFilling = true
 		for i := 0; i < accountPoolSize-len(p.pool); i++ {
-			account, err := GenMegaAccount()
+			account, err := p.GenMegaAccount()
 			if err != nil {
 				log.Println(err.Error())
 			}
@@ -46,12 +48,21 @@ func (p *MegaAccountPool) FillPool() {
 	}
 }
 
-func CreateMegaAccount() ([]byte, error) {
-	return exec.Command("/usr/bin/local/mega-create.sh").Output()
+func (p *MegaAccountPool) CreateMegaAccount() (out []byte, err error) {
+	if !p.isGeneratingAccount {
+		p.isGeneratingAccount = true
+		start := time.Now()
+		out, err = exec.Command("/usr/bin/local/mega-create.sh").Output()
+		log.Printf("account created in %v\n", time.Since(start))
+		p.isGeneratingAccount = false
+	} else {
+		log.Println("Already generating account")
+	}
+	return
 }
 
-func GenMegaAccount() (user *MegaAccount, err error) {
-	out, err := CreateMegaAccount()
+func (p *MegaAccountPool) GenMegaAccount() (user *MegaAccount, err error) {
+	out, err := p.CreateMegaAccount()
 	if err != nil {
 		return
 	}
@@ -62,7 +73,7 @@ func GenMegaAccount() (user *MegaAccount, err error) {
 func (p *MegaAccountPool) GetMegaAccount() (account *MegaAccount) {
 	if len(p.pool) == 0 {
 		var err error
-		account, err = GenMegaAccount()
+		account, err = p.GenMegaAccount()
 		if err != nil {
 			log.Println(err)
 		}
