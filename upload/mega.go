@@ -12,10 +12,12 @@ import (
 const accountPoolSize = 5
 
 type MegaAccountPool struct {
-	pool []*MegaAccount
+	pool      []*MegaAccount
+	isFilling bool
 	sync.RWMutex
 	sync.WaitGroup
 }
+
 type MegaAccount struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -24,15 +26,27 @@ type MegaAccount struct {
 	inUse    bool
 }
 
-func (p *MegaAccountPool) managePool() {
-	log.Println("starting manager")
-	for i := 0; i < accountPoolSize-len(p.pool); i++ {
-		account, err := addMegaAccount()
-		if err != nil {
-			log.Println(err.Error())
+func (p *MegaAccountPool) FillPool() {
+	if !p.isFilling {
+		log.Println("Started filling...")
+		p.isFilling = true
+		for i := 0; i < accountPoolSize-len(p.pool); i++ {
+			go func() {
+				p.Add(1)
+				defer p.Done()
+				account, err := GenMegaAccount()
+				if err != nil {
+					log.Println(err.Error())
+				}
+				p.Lock()
+				p.pool = append(p.pool, account)
+				p.Unlock()
+			}()
 		}
-		log.Printf("added account %v\n", account)
-		p.pool = append(p.pool, &account)
+		p.Wait()
+		p.isFilling = false
+	} else {
+		log.Println("Already filling...")
 	}
 }
 
@@ -40,13 +54,26 @@ func CreateMegaAccount() ([]byte, error) {
 	return exec.Command("/usr/bin/local/mega-create.sh").Output()
 }
 
-func addMegaAccount() (user MegaAccount, err error) {
-	//out, err := CreateMegaAccount()
-	//if err != nil {
-	//	return
-	//}
-	out := []byte("{\"email\": \"1588709080565468113@dlme.ga\", \"password\": \"XK5xo1syVmFqwqjfk9Q0WZlt9Hxi2RJ1YMcEiEN7UT6jBcJd1w\"}")
+func GenMegaAccount() (user *MegaAccount, err error) {
+	out, err := CreateMegaAccount()
+	if err != nil {
+		return
+	}
 	err = json.Unmarshal(out, &user)
+	return
+}
+
+func (p *MegaAccountPool) GetMegaAccount() (account *MegaAccount) {
+	if len(p.pool) == 0 {
+		var err error
+		account, err = GenMegaAccount()
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	p.Lock()
+	account, p.pool = p.pool[0], p.pool[1:]
+	p.Unlock()
 	return
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/t3rm1n4l/go-mega"
@@ -34,15 +35,17 @@ func main() {
 	var p []*MegaAccount
 	pool := MegaAccountPool{
 		p,
+		false,
 		sync.RWMutex{},
 		sync.WaitGroup{},
 	}
 
+	go pool.FillPool()
 	s := Server{m, &pool}
 
 	// cron
 	c := cron.New()
-	_, err := c.AddFunc("* * * * *", pool.managePool)
+	_, err := c.AddFunc("* * * * *", pool.FillPool)
 	if err != nil {
 		panic(err)
 	}
@@ -70,13 +73,13 @@ func (s *Server) newCodeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out, err := CreateMegaAccount()
+	account := s.pool.GetMegaAccount()
+	accountBytes, err := json.Marshal(account)
 	if err != nil {
 		renderError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	w.Write(out)
+	w.Write(accountBytes)
 }
 
 func (s *Server) uploadFileHandler(w http.ResponseWriter, r *http.Request) {
