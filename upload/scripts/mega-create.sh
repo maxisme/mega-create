@@ -41,9 +41,7 @@ for i in "$email_dir"*; do
   # use different domain
   part2=${part2/mega.nz/mega.co.nz}
   if [[ $part2 != *"mega"* ]]; then
-    # failed to receive email in time so try again with new account
-    bash "$0"
-    exit
+    exit 1
   fi
 done
 
@@ -51,14 +49,7 @@ done
 verifyCODE=$(eval "${part1/@LINK@/$part2}")
 
 if [[ $verifyCODE == *"Account registered successfully!"* ]]; then
-  # increment counter
-  if [[ "$cnt" != "" ]]; then
-    echo "$cnt" >"$cntfile"
-  fi
-
   echo "{\"email\": \"$email\", \"password\": \"$password\"}"
-
-  rm -rf "/var/mail/$DOMAINNAME/*"
 else
   echo "failed registration: $verifyCODE"
   exit 1
