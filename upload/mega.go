@@ -37,7 +37,7 @@ func (p *MegaAccountPool) managePool() {
 }
 
 func CreateMegaAccount() ([]byte, error) {
-	return exec.Command("mega-create.sh").Output()
+	return exec.Command("/usr/bin/local/mega-create.sh").Output()
 }
 
 func addMegaAccount() (user MegaAccount, err error) {
