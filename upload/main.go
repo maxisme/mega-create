@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 )
 
@@ -54,7 +55,12 @@ func main() {
 	// web handlers
 	http.HandleFunc("/upload", s.uploadFileHandler)
 	http.HandleFunc("/code", s.newCodeHandler)
+	http.HandleFunc("/size", s.poolSizeHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func (s *Server) poolSizeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(strconv.Itoa(len(s.pool.pool))))
 }
 
 func (s *Server) newCodeHandler(w http.ResponseWriter, r *http.Request) {

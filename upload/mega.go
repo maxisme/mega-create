@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-const accountPoolSize = 5
+const accountPoolSize = 20
 
 type MegaAccountPool struct {
 	pool      []*MegaAccount
@@ -44,6 +44,7 @@ func (p *MegaAccountPool) FillPool() {
 			}()
 		}
 		p.Wait()
+		log.Println("Finished filling...")
 		p.isFilling = false
 	} else {
 		log.Println("Already filling...")
