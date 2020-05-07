@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/robfig/cron"
 	"github.com/t3rm1n4l/go-mega"
 	"io/ioutil"
 	"log"
@@ -41,16 +42,16 @@ func main() {
 		sync.WaitGroup{},
 	}
 
-	//go pool.FillPool()
+	go pool.FillPool()
 	s := Server{m, &pool}
 
 	// cron
-	//c := cron.New()
-	//_, err := c.AddFunc("* * * * *", pool.FillPool)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//c.Start()
+	c := cron.New()
+	_, err := c.AddFunc("* * * * *", pool.FillPool)
+	if err != nil {
+		panic(err)
+	}
+	c.Start()
 
 	// web handlers
 	http.HandleFunc("/upload", s.uploadFileHandler)
