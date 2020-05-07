@@ -1,5 +1,6 @@
 #!/bin/bash
-domain="$DOMAINNAME"
+DOMAIN="$DOMAINNAME"
+RETRIES=10
 
 ##########
 # SCRIPT #
@@ -15,11 +16,11 @@ if [[ "$username" == "" ]]; then
 fi
 
 # create email
-email="$username@$domain"
+email="$username@$DOMAIN"
 /usr/bin/local/add-user.sh "$email" "$password"
 
 # remove all inbox
-email_dir="/var/mail/$domain/$username/new/"
+email_dir="/var/mail/$DOMAIN/$username/new/"
 rm -rf "$email_dir*"
 
 # account creation with same password generated for email
@@ -28,22 +29,23 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
 
-# wait for email...
-sleep 10
+for i in {1..$RETRIES}; do
+  sleep 1
 
-# look for verify email in inbox with verify code part2
-for i in "$email_dir"*; do
-  # get line number of https://mega.nz/#confirm
-  lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
-  # extract part2 of verification code
-  part2=$(sh -c "sed '$lineN!d' $i")
+  # look for verify email in inbox with verify code part2
+  for i in "$email_dir"*; do
+    # get line number of https://mega.nz/#confirm
+    lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
+    # extract part2 of verification code
+    part2=$(sh -c "sed '$lineN!d' $i")
 
-  # use different domain
-  part2=${part2/mega.nz/mega.co.nz}
-  if [[ $part2 != *"mega"* ]]; then
-    exit 1
-  fi
-done
+    # use new domain
+    part2=${part2/mega.nz/mega.co.nz}
+    if [[ $part2 != *"mega"* ]]; then
+      exit 1
+    fi
+  done
+don
 
 # run verifying code
 verifyCODE=$(eval "${part1/@LINK@/$part2}")
