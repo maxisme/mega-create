@@ -23,6 +23,8 @@ email="$username@$DOMAIN"
 email_dir="/var/mail/$DOMAIN/$username/new/"
 rm -rf "$email_dir*"
 
+sleep 1
+
 # account creation with same password generated for email
 reg=$(megareg --register --email "$email" --name "John Doe" --password "$password")
 
@@ -50,6 +52,7 @@ do
         exit 1
       fi
     done
+    break
   fi
   sleep 1
   let c=c+1

@@ -16,13 +16,6 @@ services:
       - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
       - ./config/postfix-policyd-spf.conf:/etc/postfix-policyd-spf-python/policyd-spf.conf
-    environment:
-      - ENABLE_SPAMASSASSIN=0
-      - ENABLE_CLAMAV=0
-      - ENABLE_FAIL2BAN=0
-      - ENABLE_POSTGREY=0
-      - ONE_DIR=0
-      - DMS_DEBUG=0
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
