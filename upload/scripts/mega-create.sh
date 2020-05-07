@@ -45,7 +45,7 @@ for i in {1..$RETRIES}; do
       exit 1
     fi
   done
-don
+done
 
 # run verifying code
 verifyCODE=$(eval "${part1/@LINK@/$part2}")
