@@ -15,6 +15,7 @@ services:
       - mailstate:/var/mail-state
       - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
+      - ./config/postfix-policyd-spf.conf:/etc/postfix-policyd-spf-python/policyd-spf.conf
     environment:
       - ENABLE_SPAMASSASSIN=0
       - SPAMASSASSIN_SPAM_TO_INBOX=0

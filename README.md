@@ -9,6 +9,8 @@ ____
 2. Create .env with domain name
 ```
 DOMAINNAME=example.com
+OVERRIDE_HOSTNAME=mail.example.com
+CREDENTIALS=*somelongstring*
 ```
 
 3. set `OVERRIDE_HOSTNAME=` in `env-mailserver` to `mail.example.com`
@@ -21,3 +23,5 @@ DOMAINNAME=example.com
 5. To allow mega account generation add a ssh public key, which can be found by running `docker exec -it mega-backup cat /root/.ssh/id_rsa.pub` on the host(s) where you are running the [mega-backup](https://github.com/maxisme/mega-backup) to `.ssh/authorized_keys`.
 
 6. Start `docker-compose up -d`
+
+7. Create new account and send an email to it.
