@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const accountPoolSize = 5
+const accountPoolSize = 20
 
 type MegaAccountPool struct {
 	pool                []*MegaAccount
