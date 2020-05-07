@@ -1,6 +1,6 @@
 #!/bin/bash
 DOMAIN="$DOMAINNAME"
-RETRIES=50
+RETRIES=5
 
 ##########
 # SCRIPT #
@@ -29,7 +29,7 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
 
-sleep 5
+sleep 10
 
 c=1
 while [[ $c -le $RETRIES ]]

@@ -18,7 +18,6 @@ services:
       - ./config/postfix-policyd-spf.conf:/etc/postfix-policyd-spf-python/policyd-spf.conf
     environment:
       - ENABLE_SPAMASSASSIN=0
-      - SPAMASSASSIN_SPAM_TO_INBOX=0
       - ENABLE_CLAMAV=0
       - ENABLE_FAIL2BAN=0
       - ENABLE_POSTGREY=0
@@ -27,6 +26,7 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
+    dns: 1.1.1.1
     restart: always
 
   mega-create:
