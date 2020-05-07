@@ -30,20 +30,23 @@ type MegaAccount struct {
 
 func (p *MegaAccountPool) FillPool() {
 	if !p.isFilling {
-		log.Println("Started filling...")
-		p.isFilling = true
-		for i := 0; i < accountPoolSize-len(p.pool); i++ {
-			account, err := p.GenMegaAccount()
-			if err != nil {
-				log.Println(err.Error())
-			} else {
-				p.Lock()
-				p.pool = append(p.pool, account)
-				p.Unlock()
+		numToFill := accountPoolSize - len(p.pool)
+		if numToFill > 0 {
+			log.Printf("Started filling %d accounts...\n", numToFill)
+			p.isFilling = true
+			for i := 0; i < numToFill; i++ {
+				account, err := p.GenMegaAccount()
+				if err != nil {
+					log.Println(err.Error())
+				} else {
+					p.Lock()
+					p.pool = append(p.pool, account)
+					p.Unlock()
+				}
 			}
+			log.Println("Finished filling...")
+			p.isFilling = false
 		}
-		log.Println("Finished filling...")
-		p.isFilling = false
 	} else {
 		log.Println("Already filling...")
 	}
