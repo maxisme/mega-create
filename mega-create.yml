@@ -1,24 +1,60 @@
 version: '3.1'
 services:
-  mega-create:
-    image: maxisme/mega-create
+  mail:
+    image: tvial/docker-mailserver:latest
+    hostname: mail
     domainname: ${DOMAINNAME:?err}
     ports:
       - "25:25"
       - "143:143"
       - "587:587"
       - "993:993"
+    environment:
+      - DMS_DEBUG=1
     volumes:
+      - maildata:/var/mail
+      - mailstate:/var/mail-state
+      - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
-    env_file:
-      - .env
+      - ./config/postfix-policyd-spf.conf:/etc/postfix-policyd-spf-python/policyd-spf.conf
     cap_add:
       - NET_ADMIN
       - SYS_PTRACE
+    dns: 1.1.1.1
+    restart: always
+    deploy:
+      placement:
+        constraints: [node.role == manager]
 
-  sshd:
-    image: maxisme/sshd:latest
+  mega-create:
+    image: maxisme/mega-create:latest
+    environment:
+      DOMAINNAME: ${DOMAINNAME:?err}
+      CREDENTIALS: ${CREDENTIALS:?err}
     volumes:
-      - "~/.ssh:/root/.ssh"
-    ports:
-      - "3307:22"
+      - maildata:/var/mail
+      - ./config/:/email-config/
+    restart: always
+    networks:
+      - traefik
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mega.rule=Host(`${DOMAINNAME}`)"
+        - "traefik.http.routers.mega.entrypoints=web-secure"
+        - "traefik.http.routers.mega.tls.certresolver=letsencrypt"
+        - "traefik.http.services.mega.loadbalancer.server.port=8080"
+      placement:
+        constraints: [node.role == manager]
+
+volumes:
+  maildata:
+    driver: local
+  mailstate:
+    driver: local
+  maillogs:
+    driver: local
+
+networks:
+  traefik:
+    external: true
