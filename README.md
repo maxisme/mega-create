@@ -22,6 +22,6 @@ CREDENTIALS=*somelongstring*
 
 5. To allow mega account generation add a ssh public key, which can be found by running `docker exec -it mega-backup cat /root/.ssh/id_rsa.pub` on the host(s) where you are running the [mega-backup](https://github.com/maxisme/mega-backup) to `.ssh/authorized_keys`.
 
-6. Start `docker-compose up -d`
+6. Start `docker-compose up -d` and `docker stack deploy -c mega-create.yml mega`
 
 7. Create new account and send an email to it.
