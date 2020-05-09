@@ -25,9 +25,7 @@ services:
     restart: always
 
   mega-create:
-    container_name: mega
-    build:
-      context: upload
+    image: maxisme/mega-create:latest
     environment:
       DOMAINNAME: ${DOMAINNAME:?err}
       CREDENTIALS: ${CREDENTIALS:?err}
