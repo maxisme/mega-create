@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/robfig/cron"
 	"github.com/t3rm1n4l/go-mega"
 	"io/ioutil"
@@ -54,10 +56,12 @@ func main() {
 	c.Start()
 
 	// web handlers
-	http.HandleFunc("/upload", s.uploadFileHandler)
-	http.HandleFunc("/code", s.newCodeHandler)
-	http.HandleFunc("/size", s.poolSizeHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.HandleFunc("/upload", s.uploadFileHandler)
+	r.HandleFunc("/code", s.newCodeHandler)
+	r.HandleFunc("/size", s.poolSizeHandler)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 func (s *Server) poolSizeHandler(w http.ResponseWriter, r *http.Request) {

@@ -7,7 +7,6 @@ services:
     volumes:
       - maildata:/var/mail
       - ./config/:/email-config/
-    restart: always
     networks:
       - traefik
     deploy:
