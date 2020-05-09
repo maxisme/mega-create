@@ -4,7 +4,6 @@ services:
     image: tvial/docker-mailserver:latest
     hostname: mail
     domainname: ${DOMAINNAME:?err}
-    container_name: mail
     ports:
       - "25:25"
       - "143:143"
@@ -23,6 +22,9 @@ services:
       - SYS_PTRACE
     dns: 1.1.1.1
     restart: always
+    deploy:
+      placement:
+        constraints: [node.role == manager]
 
   mega-create:
     image: maxisme/mega-create:latest
@@ -35,12 +37,15 @@ services:
     restart: always
     networks:
       - traefik
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mega.rule=Host(`${DOMAINNAME}`)"
-      - "traefik.http.routers.mega.entrypoints=web-secure"
-      - "traefik.http.routers.mega.tls.certresolver=letsencrypt"
-      - "traefik.http.services.mega.loadbalancer.server.port=8080"
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.mega.rule=Host(`${DOMAINNAME}`)"
+        - "traefik.http.routers.mega.entrypoints=web-secure"
+        - "traefik.http.routers.mega.tls.certresolver=letsencrypt"
+        - "traefik.http.services.mega.loadbalancer.server.port=8080"
+      placement:
+        constraints: [node.role == manager]
 
 volumes:
   maildata:
