@@ -28,8 +28,6 @@ services:
     container_name: mega
     build:
       context: upload
-    ports:
-      - "8980:8080"
     environment:
       DOMAINNAME: ${DOMAINNAME:?err}
       CREDENTIALS: ${CREDENTIALS:?err}
@@ -42,8 +40,8 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.mega.rule=Host(`${DOMAINNAME}`)"
-      - "traefik.http.routers.mega.entrypoints=websecure"
-      - "traefik.http.routers.mega.tls.certresolver=myresolver"
+      - "traefik.http.routers.mega.entrypoints=web-secure"
+      - "traefik.http.routers.mega.tls.certresolver=letsencrypt"
       - "traefik.http.services.mega.loadbalancer.server.port=8080"
 
 volumes:
