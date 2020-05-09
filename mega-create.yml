@@ -1,36 +1,9 @@
 version: '3.1'
 services:
-  mail:
-    image: tvial/docker-mailserver:latest
-    hostname: mail
-    domainname: ${DOMAINNAME:?err}
-    ports:
-      - "25:25"
-      - "143:143"
-      - "587:587"
-      - "993:993"
-    environment:
-      - DMS_DEBUG=1
-    volumes:
-      - maildata:/var/mail
-      - mailstate:/var/mail-state
-      - maillogs:/var/log/mail
-      - ./config/:/tmp/docker-mailserver/
-      - ./config/postfix-policyd-spf.conf:/etc/postfix-policyd-spf-python/policyd-spf.conf
-    cap_add:
-      - NET_ADMIN
-      - SYS_PTRACE
-    dns: 1.1.1.1
-    restart: always
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-
   mega-create:
     image: maxisme/mega-create:latest
-    environment:
-      DOMAINNAME: ${DOMAINNAME:?err}
-      CREDENTIALS: ${CREDENTIALS:?err}
+    env_file:
+      - ".env"
     volumes:
       - maildata:/var/mail
       - ./config/:/email-config/
@@ -49,10 +22,6 @@ services:
 
 volumes:
   maildata:
-    driver: local
-  mailstate:
-    driver: local
-  maillogs:
     driver: local
 
 networks:

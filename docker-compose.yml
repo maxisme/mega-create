@@ -24,24 +24,6 @@ services:
     dns: 1.1.1.1
     restart: always
 
-  mega-create:
-    image: maxisme/mega-create:latest
-    environment:
-      DOMAINNAME: ${DOMAINNAME:?err}
-      CREDENTIALS: ${CREDENTIALS:?err}
-    volumes:
-      - maildata:/var/mail
-      - ./config/:/email-config/
-    restart: always
-    networks:
-      - traefik
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mega.rule=Host(`${DOMAINNAME}`)"
-      - "traefik.http.routers.mega.entrypoints=web-secure"
-      - "traefik.http.routers.mega.tls.certresolver=letsencrypt"
-      - "traefik.http.services.mega.loadbalancer.server.port=8080"
-
 volumes:
   maildata:
     driver: local
@@ -49,7 +31,3 @@ volumes:
     driver: local
   maillogs:
     driver: local
-
-networks:
-  traefik:
-    external: true
