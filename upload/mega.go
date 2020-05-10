@@ -57,11 +57,11 @@ func (p *MegaAccountPool) CreateMegaAccount() (out []byte, err error) {
 		p.isGeneratingAccount = true
 		start := time.Now()
 		cmd := exec.Command("/usr/bin/local/mega-create.sh")
-		var stderr bytes.Buffer
-		cmd.Stderr = &stderr
+		var stdout bytes.Buffer
+		cmd.Stdout = &stdout
 		err = cmd.Run()
 		if err != nil {
-			log.Printf("mega create error: %s : %s", err, stderr.String())
+			log.Printf("mega create error: %s : %s", err, stdout.String())
 		} else {
 			log.Printf("account succesfully created in %v\n", time.Since(start))
 		}
