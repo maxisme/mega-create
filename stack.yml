@@ -5,7 +5,7 @@ services:
     env_file:
       - ".env"
     volumes:
-      - maildata:/var/mail
+      - ./mail/:/var/mail
       - ./config/:/email-config/
     networks:
       - traefik
@@ -18,10 +18,6 @@ services:
         - "traefik.http.services.mega.loadbalancer.server.port=8080"
       placement:
         constraints: [node.role == manager]
-
-volumes:
-  maildata:
-    driver: local
 
 networks:
   traefik:
