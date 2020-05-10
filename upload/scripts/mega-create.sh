@@ -60,6 +60,7 @@ while [[ $c -le $RETRIES ]]; do
 
           # clean up
           rm -rf "/var/mail/$DOMAIN/$user/" "$part1_file"
+          sed -i "/$user/d" /email-config/postfix-accounts.cf # remove account
 
           # run verifying code
           verifyCODE=$(eval "${part1/@LINK@/$part2}")
