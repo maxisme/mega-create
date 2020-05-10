@@ -13,8 +13,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.mega.rule=Host(`${DOMAINNAME}`)"
-        - "traefik.http.routers.mega.entrypoints=web-secure"
-        - "traefik.http.routers.mega.entrypoints=web"
+        - "traefik.http.routers.mega.entrypoints=web-secure,web"
         - "traefik.http.routers.mega.tls.certresolver=letsencrypt"
         - "traefik.http.services.mega.loadbalancer.server.port=8080"
       placement:
