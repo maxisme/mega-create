@@ -60,6 +60,7 @@ func (p *MegaAccountPool) CreateMegaAccount() (out []byte, err error) {
 		var stdout bytes.Buffer
 		cmd.Stdout = &stdout
 		err = cmd.Run()
+		out = stdout.Bytes()
 		if err != nil {
 			log.Printf("mega create error: %s : %s", err, stdout.String())
 		} else {
