@@ -42,7 +42,7 @@ func main() {
 
 	// cron
 	c := cron.New()
-	err := c.AddFunc("* * * * *", pool.FillPool)
+	err := c.AddFunc("0 * * * *", pool.FillPool)
 	if err != nil {
 		panic(err)
 	}
