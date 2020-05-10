@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/t3rm1n4l/go-mega"
 	"log"
 	"os/exec"
@@ -132,18 +131,4 @@ func (p *MegaAccountPool) getMegaAccount() (*MegaAccount, error) {
 	}
 	maxAccount.login = m
 	return &maxAccount, err
-}
-
-func UploadFileToMega(account *MegaAccount, fileSize uint64, path, filename string) error {
-	if account.storage.Mstrg-(fileSize+account.storage.Cstrg) <= 0 {
-		return fmt.Errorf("total allowed: %d left: %d upload: %d", account.storage.Mstrg, account.storage.Cstrg, fileSize)
-	}
-
-	// upload file to mega
-	_, err := account.login.UploadFile(path, account.login.FS.GetRoot(), filename, nil)
-	if err != nil {
-		return err
-	}
-	account.storage.Cstrg += fileSize
-	return nil
 }
