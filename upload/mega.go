@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/t3rm1n4l/go-mega"
 	"log"
@@ -55,8 +56,15 @@ func (p *MegaAccountPool) CreateMegaAccount() (out []byte, err error) {
 	if !p.isGeneratingAccount {
 		p.isGeneratingAccount = true
 		start := time.Now()
-		out, err = exec.Command("/usr/bin/local/mega-create.sh").Output()
-		log.Printf("account created in %v\n", time.Since(start))
+		cmd := exec.Command("/usr/bin/local/mega-create.sh")
+		var stderr bytes.Buffer
+		cmd.Stderr = &stderr
+		err = cmd.Run()
+		if err != nil {
+			log.Printf("mega create error: %s : %s", err, stderr.String())
+		} else {
+			log.Printf("account succesfully created in %v\n", time.Since(start))
+		}
 		p.isGeneratingAccount = false
 	} else {
 		log.Println("Already generating account")
