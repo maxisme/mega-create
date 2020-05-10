@@ -11,7 +11,7 @@ password=$(
 )
 
 username="$1"
-if [[ "$username" == "" ]]; then
+if [[ -z "$username" ]]; then
   username=$(date +%s%N)
 fi
 
@@ -20,8 +20,7 @@ email="$username@$DOMAIN"
 /usr/bin/local/add-user.sh "$email" "$password"
 
 # remove all inbox
-email_dir="/var/mail/$DOMAIN/$username/new/"
-rm -rf "$email_dir*"
+rm -rf "/var/mail/$DOMAIN/$username/*"
 
 sleep 5
 
@@ -31,35 +30,43 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
 
+echo "$part1" > "/var/mail/$DOMAIN/$username/part1.txt"
+
 c=1
 while [[ $c -le $RETRIES ]]
 do
-  if [ -d "$email_dir" ]; then
-    # look for verify email in inbox with verify code part2
-    for i in "$email_dir"*; do
-      # get line number of https://mega.nz/#confirm
-      lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
-      # extract part2 of verification code
-      part2=$(sh -c "sed '$lineN!d' $i")
+  # look for verify email in inbox with verify code part2
+  for user in "/var/mail/$DOMAIN/*/"; do
+    if [ -d "/var/mail/$DOMAIN/$user/new/" ]; then
+      for i in "/var/mail/$DOMAIN/$user/new/"*; do
+        part1=$(cat /var/mail/$DOMAIN/$user/part1.txt)
 
-      # use new domain
-      part2=${part2/mega.nz/mega.co.nz}
-      if [[ $part2 != *"mega"* ]]; then
-        exit 1
-      fi
+        # get line number of https://mega.nz/#confirm
+        lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
+        # extract part2 of verification code
+        part2=$(sh -c "sed '$lineN!d' $i")
 
-      # clean up
-      rm -rf "/var/mail/$DOMAIN/$username/*"
-    done
-    break
-  fi
-  sleep 2
+        # use new domain
+        part2=${part2/mega.nz/mega.co.nz}
+        if [[ $part2 != *"mega"* ]]; then
+          exit 1
+        fi
+
+        email="$user@$DOMAIN"
+
+        # clean up
+        rm -rf "/var/mail/$DOMAIN/$user/"
+        break
+      done
+    fi
+  done
+  sleep 1
   let c=c+1
 done
 
 if [ -z "$part2" ]
 then
-  echo "$username did not receive confirmation email in time"
+  echo "Did not receive any confirmation emails in time."
   exit 1
 fi
 
