@@ -5,7 +5,7 @@ services:
     env_file:
       - ".env"
     volumes:
-      - ./mail/:/var/mail
+      - ./mail/:/var/mail/
       - ./config/:/email-config/
     networks:
       - traefik

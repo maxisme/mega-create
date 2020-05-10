@@ -13,7 +13,7 @@ services:
     environment:
       - DMS_DEBUG=1
     volumes:
-      - ./mail/:/var/mail
+      - ./mail/:/var/mail/
       - mailstate:/var/mail-state
       - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
