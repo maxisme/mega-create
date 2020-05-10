@@ -77,6 +77,7 @@ func (p *MegaAccountPool) GenMegaAccount() (user *MegaAccount, err error) {
 	if err != nil {
 		return
 	}
+	log.Println(string(out))
 	err = json.Unmarshal(out, &user)
 	return
 }
