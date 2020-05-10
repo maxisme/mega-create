@@ -29,7 +29,7 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
-echo "$part1" > "/tmp/${username}.txt"
+echo "$part1" >"/tmp/${username}.txt"
 
 sleep 3
 
@@ -79,8 +79,5 @@ while [[ $c -le $RETRIES ]]; do
   let c=c+1
 done
 
-
 echo "Did not receive any confirmation emails in time."
 exit 1
-
-
