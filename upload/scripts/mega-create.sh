@@ -30,6 +30,7 @@ reg=$(megareg --register --email "$email" --name "John Doe" --password "$passwor
 # get verify code part 1
 part1=$(echo "${reg}" | sed -n 3p)
 echo "$part1" >"/var/mail/${username}.txt"
+echo "$password" >"/var/mail/${username}_pass.txt"
 
 sleep 3
 
@@ -44,6 +45,7 @@ while [[ $c -le $RETRIES ]]; do
         part1_file="/var/mail/${user}.txt"
         if [ -f "$part1_file" ]; then
           part1=$(cat "$part1_file")
+          pass=$(cat "/var/mail/${user}_pass.txt")
 
           # get line number of https://mega.nz/#confirm
           lineN=$(awk '/https:\/\/mega\.nz\/\#confirm/{ print NR; exit }' "$i")
@@ -66,7 +68,7 @@ while [[ $c -le $RETRIES ]]; do
           verifyCODE=$(eval "${part1/@LINK@/$part2}")
 
           if [[ $verifyCODE == *"Account registered successfully!"* ]]; then
-            echo "{\"email\": \"$email\", \"password\": \"$password\"}"
+            echo "{\"email\": \"$email\", \"password\": \"$pass\"}"
             exit
           else
             echo "failed registration: $verifyCODE"
