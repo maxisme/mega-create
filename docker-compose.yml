@@ -11,8 +11,6 @@ services:
       - DMS_DEBUG=1
     volumes:
       - ./mail/:/var/mail/
-      - mailstate:/var/mail-state
-      - maillogs:/var/log/mail
       - ./config/:/tmp/docker-mailserver/
       - ./config/postfix-policyd-spf.conf:/etc/postfix-policyd-spf-python/policyd-spf.conf
     cap_add:
@@ -20,9 +18,3 @@ services:
       - SYS_PTRACE
     dns: 1.1.1.1
     restart: always
-
-volumes:
-  mailstate:
-    driver: local
-  maillogs:
-    driver: local
