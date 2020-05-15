@@ -7,9 +7,6 @@ services:
     container_name: mail
     ports:
       - "25:25"
-      - "143:143"
-      - "587:587"
-      - "993:993"
     environment:
       - DMS_DEBUG=1
     volumes:
